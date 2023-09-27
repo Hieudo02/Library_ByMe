@@ -1,0 +1,166 @@
+___________________________________________________________________________________
+/*********************************encoder READ x1*********************************/
+#define encA 16
+#define encB 17
+
+int count = 0;
+
+void IRAM_ATTR encRead(){
+  if((digitalRead(encA) == 0) && (digitalRead(encB) == 1)) count++; // CW
+  else if((digitalRead(encA) == 0) && (digitalRead(encB) == 0)) count--; // CCW
+  // count++;
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(encA, INPUT_PULLUP);
+  pinMode(encB, INPUT_PULLUP);
+
+  attachInterrupt(encA, encRead, FALLING);
+}
+
+void loop() {
+  Serial.println(count);
+  delay(500);
+}
+
+
+___________________________________________________________________________________
+/*********************************encoder READ x2*********************************/
+#define encA 16
+#define encB 17
+uint8_t encA_State;
+uint8_t encB_State;
+
+int count = 0;
+
+void IRAM_ATTR encRead(){
+  encA_State = digitalRead(encA);
+  encB_State = digitalRead(encB);
+
+  if
+  (
+    ((encA_State == 0) && (encB_State == 1)) | 
+    ((encA_State == 1) && (encB_State == 0))
+  ) count += 2; 
+  else if
+  ( 
+    ((encA_State == 0) && (encB_State == 0)) | 
+    ((encA_State == 1) && (encB_State == 1))
+  ) count -= 2;
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(encA, INPUT_PULLUP);
+  pinMode(encB, INPUT_PULLUP);
+
+  attachInterrupt(encA, encRead, CHANGE);
+}
+
+void loop() {
+  Serial.println(count);
+  delay(500);
+}
+
+/*
+  encA_State = digitalRead(encA_Pin);
+  encB_State = digitalRead(encB_Pin);
+  switch ((encA_State << 1) | encB_State) {
+    case 1:
+    case 2:
+      count++; // CW
+    break;
+
+    case 0:
+    case 3:
+      count--; // CCW
+    break;
+*/
+
+___________________________________________________________________________________
+/********************ĐỌC ENCODER CHẾ ĐỘ X4*******************/
+#define encA 16
+#define encB 17
+uint8_t encA_state;
+uint8_t encB_state;
+unsigned char state;
+unsigned char p_state;
+
+int pulseCount = 0;
+
+void IRAM_ATTR readEncoderX4(){
+  encA_state = digitalRead(encA);
+  encB_state = digitalRead(encB);
+  // xác định kênh gây ra ngắt
+  int interruptPin = digitalPinToInterrupt(encA_state) == digitalPinToInterrupt(encA) ? encA : encB;
+  state = (state << 1) | encA_state;
+  state = (state << 1) | encB_state;
+  state = state&0x03; // bỏ hết các bit đầu chỉ giữ lại 2 bit cuối (0->3)
+  // xử lý ngắt cho kênh A
+  if (interruptPin == encA) {
+    switch(state){
+      case 2:
+        if (p_state == 0) pulseCount++;
+        else pulseCount--;
+      break;
+      case 1:
+        if (p_state == 3) pulseCount++;
+        else pulseCount--;
+      break;
+      case 0:
+        if (p_state == 2) pulseCount--;
+        else pulseCount++;
+      break;
+      case 3:
+        if (p_state == 1) pulseCount--;
+        else pulseCount++;
+      break;
+    }
+    p_state = state;
+  }
+
+  // xử lý ngắt cho kênh B
+  else if(interruptPin == encB){
+    switch(state){
+      case 3:
+        if (p_state == 2) pulseCount++;
+        else pulseCount--;
+      break;
+      case 0:
+        if (p_state == 1) pulseCount++;
+        else pulseCount--;
+      break;
+      case 1:
+        if (p_state == 0) pulseCount--;
+        else pulseCount++;
+      break;
+      case 2:
+        if (p_state == 3) pulseCount--;
+        else pulseCount++;
+      break;
+    }
+    p_state = state;
+  }
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  pinMode(encA, INPUT_PULLUP);
+  pinMode(encB, INPUT_PULLUP);
+
+  p_state = (p_state << 1) | digitalRead(encA);
+  p_state = (p_state << 1) | digitalRead(encB);
+  p_state = p_state & 0x03;
+
+  attachInterrupt(encA, readEncoderX4, CHANGE);
+  attachInterrupt(encB, readEncoderX4, CHANGE);
+}
+
+void loop() {
+  Serial.println(pulseCount);
+  delay(500);
+}
