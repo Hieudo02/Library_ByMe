@@ -1,0 +1,17 @@
+[
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "C:\\Users\\ADMIN\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.13\\cores\\esp32"
+  },
+  {
+    "Sourcefile": null,
+    "Include": "",
+    "Includepath": "C:\\Users\\ADMIN\\AppData\\Local\\Arduino15\\packages\\esp32\\hardware\\esp32\\2.0.13\\variants\\esp32"
+  },
+  {
+    "Sourcefile": "C:\\Users\\ADMIN\\OneDrive - Unicorn\\Desktop\\HBS57_driver\\build\\sketch\\HBS57_driver.ino.cpp",
+    "Include": "",
+    "Includepath": null
+  }
+]
