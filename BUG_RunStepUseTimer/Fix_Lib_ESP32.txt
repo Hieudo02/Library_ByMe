@@ -1,0 +1,25 @@
++ Go to:
+	esp32-hal-timer.c
+(C:\Users\ADMIN\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.13\cores\esp32)
+
++ Change to attatched file (esp32-hal-timer.c_NEW.txt)
+
+-------------------------------------------------------------------------------------------
++ Go to:
+	esp32-hal-timer.c
+(C:\Users\ADMIN\AppData\Local\Arduino15\packages\esp32\hardware\esp32\2.0.13\cores\esp32)
+
++ Add "volatile":
+typedef volatile union {
+    struct {
+        uint32_t reserved0:   10;
+        uint32_t alarm_en:     1;             /*When set  alarm is enabled*/
+        uint32_t level_int_en: 1;             /*When set  level type interrupt will be generated during alarm*/
+        uint32_t edge_int_en:  1;             /*When set  edge type interrupt will be generated during alarm*/
+        uint32_t divider:     16;             /*Timer clock (T0/1_clk) pre-scale value.*/
+        uint32_t autoreload:   1;             /*When set  timer 0/1 auto-reload at alarming is enabled*/
+        uint32_t increase:     1;             /*When set  timer 0/1 time-base counter increment. When cleared timer 0 time-base counter decrement.*/
+        uint32_t enable:       1;             /*When set timer 0/1 time-base counter is enabled*/
+    };
+    uint32_t val;
+} timer_cfg_t;
